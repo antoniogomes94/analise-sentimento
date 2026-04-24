@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Análise de Sentimentos</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header>
+      <h1>Análise de Sentimentos</h1>
+      <p class="subtitle">Análise linguística com IA</p>
+    </header>
+
+    <!-- Main form card -->
+    <main>
+      <div class="card">
+
+        <!-- Model selector (custom dropdown) -->
+        <div class="field-group">
+          <label for="model-trigger">Modelo</label>
+          <div class="model-selector" id="model-selector">
+            <button class="model-trigger" id="model-trigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="model-trigger__label" id="model-trigger-label">Selecione um modelo</span>
+              <span class="model-trigger__arrow" aria-hidden="true">▾</span>
+            </button>
+            <ul class="model-dropdown" id="model-dropdown" role="listbox" aria-label="Selecione o modelo" hidden>
+              <!-- Populated dynamically by models.js -->
+            </ul>
+          </div>
+          <!-- Error message when no models are configured -->
+          <p class="field-hint" id="model-hint"></p>
+        </div>
+
+        <!-- Text input -->
+        <div class="field-group">
+          <label for="text-input">Texto para análise</label>
+          <textarea
+            id="text-input"
+            rows="7"
+            placeholder="Cole aqui o texto para análise de sentimentos..."
+            spellcheck="true"
+            lang="pt-BR"
+          ></textarea>
+        </div>
+
+        <!-- Analyze button -->
+        <button class="btn-analyze" id="btn-analyze" disabled>
+          <span class="btn-analyze__text">Analisar</span>
+          <span class="btn-analyze__spinner" aria-hidden="true" hidden></span>
+        </button>
+
+      </div>
+
+      <!-- Result section (hidden until first result) -->
+      <div class="card result-card" id="result-section" hidden>
+        <div class="result-header">
+          <h2>Resultado</h2>
+          <div class="result-meta" id="result-meta"></div>
+        </div>
+
+        <!-- Visual sentiment bars -->
+        <div class="sentiments-grid" id="sentiments-grid"></div>
+
+        <!-- Dominant / summary row -->
+        <div class="result-summary" id="result-summary"></div>
+
+        <!-- Raw JSON collapsible -->
+        <details class="raw-json">
+          <summary>JSON bruto</summary>
+          <pre id="raw-json-output"></pre>
+        </details>
+      </div>
+
+      <!-- Error section (hidden until error) -->
+      <div class="card error-card" id="error-section" hidden>
+        <h2>Erro</h2>
+        <p id="error-message"></p>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Script load order matters: config -> models -> api-client -> app -->
+  <script src="models.config.js"></script>
+  <script src="js/models.js"></script>
+  <script src="js/api-client.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
