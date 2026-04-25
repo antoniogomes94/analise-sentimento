@@ -6,17 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const modelSelector = document.getElementById('model-selector');
   const container = document.querySelector('.container');
 
-  const sentimentColors = {
-    medo: '#ff6b6b',
-    raiva: '#ff4500',
-    tristeza: '#4a9eff',
-    desespero: '#9d4edd',
-    surpresa: '#ffd60a',
-    alivio: '#2ea043',
-    confusao: '#ff8c42',
-    calma: '#52b788',
-  };
-
   ModelsModule.init();
 
   ModelsModule.onModelChange(() => {
@@ -136,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const fillDiv = document.createElement('div');
       fillDiv.className = 'sentiment-bar-fill';
       fillDiv.style.width = `${value * 100}%`;
-      fillDiv.style.backgroundColor = sentimentColors[name] || '#888';
+      fillDiv.dataset.emotion = name;
 
       trackDiv.appendChild(fillDiv);
       item.appendChild(label);
