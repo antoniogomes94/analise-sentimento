@@ -61,7 +61,31 @@ Critérios obrigatórios:
     return 'Erro desconhecido';
   };
 
+  const SENTIMENTOS = ['medo', 'raiva', 'tristeza', 'desespero', 'surpresa', 'alivio', 'confusao', 'calma'];
+
   const providers = {
+    async mock() {
+      await new Promise(r => setTimeout(r, 600 + Math.random() * 800));
+
+      const scores = Object.fromEntries(SENTIMENTOS.map(s => [s, parseFloat(Math.random().toFixed(2))]));
+      const dominante = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+      const positivos = scores.alivio + scores.calma + scores.surpresa;
+      const negativos = scores.medo + scores.raiva + scores.tristeza + scores.desespero;
+      const valencia = positivos > negativos + 0.3 ? 'positivo'
+                     : negativos > positivos + 0.3 ? 'negativo'
+                     : Math.abs(positivos - negativos) < 0.15 ? 'neutro'
+                     : 'misto';
+
+      return JSON.stringify({
+        sentimentos: scores,
+        sentimento_dominante: dominante,
+        valencia,
+        intensidade_geral: parseFloat((Math.random() * 0.6 + 0.2).toFixed(2)),
+        confiabilidade_analise: parseFloat((Math.random() * 0.4 + 0.5).toFixed(2)),
+        justificativa: '[Mock] Resultado gerado automaticamente com scores aleatórios para fins de teste da interface.',
+      });
+    },
+
     async openai(config, prompt) {
       const url = 'https://api.openai.com/v1/chat/completions';
       const response = await fetch(url, {

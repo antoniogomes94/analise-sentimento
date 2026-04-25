@@ -45,6 +45,7 @@ body {
   max-width: 760px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  transition: max-width 0.35s ease;
 }
 
 header {
@@ -234,13 +235,17 @@ textarea:focus {
 }
 
 .btn-analyze__spinner {
-  display: inline-block;
+  display: none;
   width: 14px;
   height: 14px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+}
+
+.btn-analyze__spinner:not([hidden]) {
+  display: inline-block;
 }
 
 @keyframes spin {
@@ -409,6 +414,9 @@ textarea:focus {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   line-height: 1.4;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 /* Error Card */
@@ -426,4 +434,59 @@ textarea:focus {
   margin: 0;
   color: var(--text-primary);
   word-break: break-word;
+}
+
+/* ── Split layout ── */
+.container.layout--split {
+  max-width: 1280px;
+}
+
+.container.layout--split #main-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* Form card: coluna 1 */
+.container.layout--split #main-content > .card:first-child {
+  grid-column: 1;
+  grid-row: 1;
+  margin-bottom: 0;
+}
+
+/* Result card: coluna 2 */
+.container.layout--split #result-section {
+  grid-column: 2;
+  grid-row: 1;
+  margin-bottom: 0;
+}
+
+/* Fade-in no resultado */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.result-card.result--animate {
+  animation: fadeInUp 0.3s ease forwards;
+}
+
+/* ── Mobile ≤899px: layout de coluna única ── */
+@media (max-width: 899px) {
+  .container.layout--split {
+    max-width: 760px;
+  }
+
+  .container.layout--split #main-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .container.layout--split #main-content > .card:first-child,
+  .container.layout--split #result-section {
+    grid-column: unset;
+    grid-row: unset;
+    margin-bottom: 1.5rem;
+  }
 }

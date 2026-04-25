@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const resultSection = document.getElementById('result-section');
   const errorSection = document.getElementById('error-section');
   const modelSelector = document.getElementById('model-selector');
+  const container = document.querySelector('.container');
 
   const sentimentColors = {
     medo: '#ff6b6b',
@@ -34,6 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const model = ModelsModule.getSelectedModel();
     const hasText = textarea.value.trim().length > 0;
     btnAnalyze.disabled = !model || !hasText;
+
+    const spinner = btnAnalyze.querySelector('.btn-analyze__spinner');
+    const text = btnAnalyze.querySelector('.btn-analyze__text');
+    spinner.hidden = true;
+    text.textContent = 'Analisar';
   };
 
   const setState = (state, payload) => {
@@ -43,22 +49,36 @@ document.addEventListener('DOMContentLoaded', () => {
     if (state === 'loading') {
       btnAnalyze.disabled = true;
       text.textContent = 'Analisando...';
-      spinner.removeAttribute('hidden');
-      resultSection.setAttribute('hidden', '');
-      errorSection.setAttribute('hidden', '');
+      spinner.hidden = false;
+      if (!container.classList.contains('layout--split')) {
+        resultSection.hidden = true;
+      }
+      errorSection.hidden = true;
     } else if (state === 'result') {
       btnAnalyze.disabled = false;
       text.textContent = 'Analisar';
-      spinner.setAttribute('hidden', '');
-      errorSection.setAttribute('hidden', '');
-      resultSection.removeAttribute('hidden');
+      spinner.hidden = true;
+      errorSection.hidden = true;
+      resultSection.hidden = false;
+
+      container.classList.add('layout--split');
+
+      resultSection.classList.remove('result--animate');
+      void resultSection.offsetWidth;
+      resultSection.classList.add('result--animate');
+
       renderResult(payload.result, payload.model);
+
+      if (window.innerWidth < 900) {
+        resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     } else if (state === 'error') {
       btnAnalyze.disabled = false;
       text.textContent = 'Analisar';
-      spinner.setAttribute('hidden', '');
-      resultSection.setAttribute('hidden', '');
-      errorSection.removeAttribute('hidden');
+      spinner.hidden = true;
+      container.classList.remove('layout--split');
+      resultSection.hidden = true;
+      errorSection.hidden = false;
       document.getElementById('error-message').textContent = payload;
     }
   };
