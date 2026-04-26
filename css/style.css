@@ -598,6 +598,7 @@ textarea:focus {
   .container.layout--split #main-content {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
   }
 
   .container.layout--split #main-content > .card:first-child,
