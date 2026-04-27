@@ -200,7 +200,8 @@ label {
   font-size: 0.9rem;
 }
 
-textarea {
+textarea,
+.text-input {
   width: 100%;
   padding: 0.75rem;
   background: var(--bg-input);
@@ -209,11 +210,16 @@ textarea {
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 0.9rem;
-  resize: vertical;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
-textarea:focus {
+textarea {
+  resize: vertical;
+}
+
+textarea:focus,
+.text-input:focus {
   outline: none;
   border-color: var(--border-focus);
 }

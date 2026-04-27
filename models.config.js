@@ -16,11 +16,11 @@ window.MODELS = [
     modelName: "Random Data",
   },
   {
-    id: "ollama-gemma",
-    provider: "ollama",
-    providerName: "Ollama Local",
-    modelName: "llama3.2",
-    baseUrl: "http://localhost:11434",
-    model: "llama3.2:latest"
+    id: "openai-gpt4o-mini",
+    provider: "openai",
+    providerName: "Open AI",
+    modelName: "GPT-4o Mini",
+    apiKey: "",
+    model: "gpt-4o-mini"
   }
 ];

@@ -52,6 +52,22 @@
           <p class="field-hint" id="model-hint"></p>
         </div>
 
+        <!-- API Key (visible only for models that require one and don't have it pre-configured) -->
+        <div class="field-group" id="api-key-group" hidden>
+          <label for="api-key-input"><span id="api-key-label">Chave da API</span></label>
+          <input
+            type="password"
+            id="api-key-input"
+            class="text-input"
+            placeholder="Cole sua chave aqui"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <p class="field-hint">
+            Salva apenas no seu navegador (localStorage). Nunca é enviada a nenhum servidor além da API do provedor.
+          </p>
+        </div>
+
         <!-- Text input -->
         <div class="field-group">
           <label for="text-input">Texto para análise</label>
@@ -104,11 +120,26 @@
 
   <!-- Script load order matters: config -> models -> api-client -> app -->
   <script src="models.config.js"></script>
-  <!-- Descomente a linha abaixo para usar models.config.local.js com APIs reais -->
-  <!-- <script src="models.config.local.js"></script> -->
-  <script src="js/theme.js"></script>
-  <script src="js/models.js"></script>
-  <script src="js/api-client.js"></script>
-  <script src="js/app.js"></script>
+  <script>
+    // Carrega models.config.local.js se existir (override silencioso, sem erro 404)
+    (async () => {
+      try {
+        const res = await fetch('models.config.local.js', { cache: 'no-store' });
+        if (res.ok) {
+          new Function(await res.text())();
+        }
+      } catch (_) { /* arquivo ausente: usa config padrão */ }
+
+      for (const src of ['js/theme.js', 'js/models.js', 'js/api-client.js', 'js/app.js']) {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = src;
+          s.onload = resolve;
+          s.onerror = reject;
+          document.body.appendChild(s);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

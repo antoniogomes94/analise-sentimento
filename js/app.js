@@ -1,4 +1,12 @@
-document.addEventListener('DOMContentLoaded', () => {
+const onReady = (fn) => {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fn);
+  } else {
+    fn();
+  }
+};
+
+onReady(() => {
   const textarea = document.getElementById('text-input');
   const btnAnalyze = document.getElementById('btn-analyze');
   const resultSection = document.getElementById('result-section');
@@ -6,9 +14,48 @@ document.addEventListener('DOMContentLoaded', () => {
   const modelSelector = document.getElementById('model-selector');
   const container = document.querySelector('.container');
 
+  const apiKeyGroup = document.getElementById('api-key-group');
+  const apiKeyInput = document.getElementById('api-key-input');
+  const apiKeyLabel = document.getElementById('api-key-label');
+
+  const PROVIDER_LABELS = {
+    openai: 'OpenAI',
+    anthropic: 'Anthropic (Claude)',
+    gemini: 'Google Gemini',
+  };
+
+  const storageKeyFor = (provider) => `apiKey_${provider}`;
+
+  const needsUserApiKey = (model) =>
+    model && PROVIDER_LABELS[model.provider] && !model.apiKey;
+
+  const updateApiKeyField = (model) => {
+    if (!needsUserApiKey(model)) {
+      apiKeyGroup.hidden = true;
+      return;
+    }
+    apiKeyGroup.hidden = false;
+    apiKeyLabel.textContent = `Chave da API ${PROVIDER_LABELS[model.provider]}`;
+    apiKeyInput.value = localStorage.getItem(storageKeyFor(model.provider)) || '';
+    apiKeyInput.dataset.provider = model.provider;
+  };
+
+  apiKeyInput.addEventListener('input', () => {
+    const provider = apiKeyInput.dataset.provider;
+    if (!provider) return;
+    const value = apiKeyInput.value.trim();
+    if (value) {
+      localStorage.setItem(storageKeyFor(provider), value);
+    } else {
+      localStorage.removeItem(storageKeyFor(provider));
+    }
+    updateAnalyzeButton();
+  });
+
   ModelsModule.init();
 
-  ModelsModule.onModelChange(() => {
+  ModelsModule.onModelChange((model) => {
+    updateApiKeyField(model);
     updateAnalyzeButton();
   });
 
@@ -20,10 +67,19 @@ document.addEventListener('DOMContentLoaded', () => {
     runAnalysis();
   });
 
+  const resolveApiKey = (model) => {
+    if (model.apiKey) return model.apiKey;
+    if (PROVIDER_LABELS[model.provider]) {
+      return localStorage.getItem(storageKeyFor(model.provider)) || '';
+    }
+    return '';
+  };
+
   const updateAnalyzeButton = () => {
     const model = ModelsModule.getSelectedModel();
     const hasText = textarea.value.trim().length > 0;
-    btnAnalyze.disabled = !model || !hasText;
+    const missingKey = needsUserApiKey(model) && !resolveApiKey(model);
+    btnAnalyze.disabled = !model || !hasText || missingKey;
 
     const spinner = btnAnalyze.querySelector('.btn-analyze__spinner');
     const text = btnAnalyze.querySelector('.btn-analyze__text');
@@ -88,8 +144,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setState('loading');
 
+    const effectiveModel = { ...model, apiKey: resolveApiKey(model) };
+
     try {
-      const result = await ApiClient.analyze(model, text);
+      const result = await ApiClient.analyze(effectiveModel, text);
       setState('result', { result, model });
     } catch (err) {
       setState('error', err.message);
